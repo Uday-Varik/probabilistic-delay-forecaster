@@ -15,3 +15,4 @@ data/processed/*
 *.ckpt
 mlruns/
 .ipynb_checkpoints/
+PRD.md
