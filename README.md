@@ -73,19 +73,23 @@ GPU-heavy training steps (TFT training) run on Colab/Kaggle notebooks, not local
 
 ## Status
 
-🚧 Week 1 — synthetic dataset generated and verified (see case_study.md). XGBoost quantile
-and Prophet per-lane baselines trained and evaluated on a 90-day holdout:
+🚧 Week 2 — baseline (XGBoost, Prophet) and TFT deep-learning model both trained and evaluated.
+Headline result — **deep learning did not win**: XGBoost beat TFT on both accuracy and
+calibration. Full honest writeup, including why, in case_study.md.
 
-| model | MAE | MAPE | p10-p90 coverage (nominal 80%) |
-|---|---|---|---|
-| XGBoost | 0.0072 | 14.11% | 78.78% |
-| Prophet | 0.0130 | 27.29% | 89.89% |
+| model | eval window | MAE | MAPE | coverage (nominal 80%) |
+|---|---|---|---|---|
+| XGBoost (quantile) | 90-day rolling | 0.0072 | 14.11% | 78.78% |
+| Prophet (per-lane) | 90-day rolling | 0.0130 | 27.29% | 89.89% |
+| TFT | 14-day window | 0.0084 | 15.19% | 71.43% |
 
-XGBoost wins on both accuracy (~half the error) and calibration; Prophet is over-conservative.
-That's the bar the TFT model needs to beat next. Next: TFT/N-BEATS deep-learning model.
+PSI-based drift monitor (`src/monitoring/drift.py`) built and tested — correctly flags an
+injected distribution shift while leaving unshifted features clean. Next: align TFT/baseline
+eval windows, FastAPI serving, Docker.
 
 Regenerate/retrain locally with:
 ```bash
 python data/scripts/generate_shipments.py
 python -m src.baseline.train
+python -m src.deep.train_tft --max-epochs 20
 ```
