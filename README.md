@@ -73,13 +73,19 @@ GPU-heavy training steps (TFT training) run on Colab/Kaggle notebooks, not local
 
 ## Status
 
-🚧 Week 1 — synthetic shipment-delay dataset generated (10,950 lane-day rows, 10 lanes,
-2023-08-25 to 2026-08-23) and verified: overall delay rate 5.42% (target ~5-10%), peak season
-1.7x delay multiplier confirmed in the data (5.1% → 8.9%), weather shocks 3.5x (5.0% → 17.5%),
-weekend 1.27x, and the `weather_risk_score` leading indicator correctly elevated on shock days
-(0.16 → 0.71) without being a perfect predictor. Next: XGBoost/Prophet baseline.
+🚧 Week 1 — synthetic dataset generated and verified (see case_study.md). XGBoost quantile
+and Prophet per-lane baselines trained and evaluated on a 90-day holdout:
 
-Regenerate locally with:
+| model | MAE | MAPE | p10-p90 coverage (nominal 80%) |
+|---|---|---|---|
+| XGBoost | 0.0072 | 14.11% | 78.78% |
+| Prophet | 0.0130 | 27.29% | 89.89% |
+
+XGBoost wins on both accuracy (~half the error) and calibration; Prophet is over-conservative.
+That's the bar the TFT model needs to beat next. Next: TFT/N-BEATS deep-learning model.
+
+Regenerate/retrain locally with:
 ```bash
 python data/scripts/generate_shipments.py
+python -m src.baseline.train
 ```

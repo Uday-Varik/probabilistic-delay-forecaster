@@ -20,8 +20,29 @@ imbalanced delay-event distribution vs. smooth retail/electricity benchmarks)_
 _TODO_
 
 ## 6. Results
-_TODO — baseline vs. DL comparison (accuracy AND calibration), be honest if DL doesn't win on
-every axis_
+
+**Baseline comparison** (`src/baseline/train.py`, 90-day time-based holdout, no shuffling):
+
+| model | MAE | MAPE | p10-p90 coverage (nominal 80%) |
+|---|---|---|---|
+| XGBoost (quantile) | 0.0072 | 14.11% | 78.78% |
+| Prophet (per-lane) | 0.0130 | 27.29% | 89.89% |
+
+XGBoost wins clearly on point-forecast accuracy (roughly half Prophet's error on both MAE and
+MAPE) and is well-calibrated (78.78% actual vs. 80% nominal coverage — close to ideal). Prophet
+is over-conservative — 89.89% actual coverage means its intervals are wider than they need to
+be, which combined with the higher error suggests the interval width is compensating for
+inaccuracy rather than reflecting genuine uncertainty.
+
+**Why XGBoost likely wins here:** it has direct access to lag (1/7/14-day) and rolling-mean
+delay-rate features that Prophet's additive trend+seasonality model doesn't use in the same
+way, and it implicitly pools statistical strength across all 10 lanes via the categorical
+`lane_id` feature — each Prophet model, by contrast, is fit independently per lane on a smaller
+slice of data. This is a real, measured result, not an assumption going in; it also sets the
+bar the deep-learning model needs to clear to justify its added complexity per this project's
+own non-goal (G2: not claiming DL wins by default).
+
+**TFT/N-BEATS deep-learning results:** not yet run — Week 2 of this project.
 
 ## 7. Skills demonstrated
 _TODO_
