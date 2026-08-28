@@ -27,7 +27,32 @@ every axis_
 _TODO_
 
 ## 8. Data strategy
-_TODO — dataset size, injected data-quality issues, delay-rate imbalance_
+
+Deterministically generated (`data/scripts/domain.py` + `generate_shipments.py`, seeded via
+`numpy.random.default_rng`) at daily lane-level granularity — each lane-day's shipment volume
+and delayed count are sampled from normal/binomial distributions parameterized by seasonality,
+holidays, and shock state, which is statistically equivalent to shipment-level simulation
+without materializing millions of individual rows.
+
+- **Scale:** 10,950 rows — 10 synthetic lanes (a Memphis hub-and-spoke structure, for narrative
+  plausibility; lane names/volumes/rates are invented, not real FedEx data) × 1,095 days
+  (2023-08-25 to 2026-08-23).
+- **Realized delay rate:** 5.42% overall, within the ~5-10% target.
+- **Seasonality:** peak shipping season (Nov 20 - Dec 26) carries a 1.6x volume and 1.7x delay
+  multiplier, verified in the generated data (5.1% → 8.9% delay rate). Weekends carry a 0.55x
+  volume and 1.3x delay multiplier (verified: 5.1% → 6.4%).
+- **Shock events:** 15-25 randomly-placed 1-3 day "weather shock" windows per lane (427
+  lane-days total), each with a 2.5-4.5x delay multiplier (verified: 5.0% → 17.5%).
+- **Imperfect leading indicator:** `weather_risk_score` is elevated on shock days (mean 0.71)
+  vs. non-shock days (mean 0.16) but with real noise on both sides — deliberately not a perfect
+  predictor, so the deep-learning model has a genuinely informative but imperfect signal to
+  work with rather than a solved problem.
+- **Data quality issue:** ~2.5% of shipments per lane-day have no scan event (missing data),
+  tracked via `total_shipments` vs. `scanned_shipments`, so delay rate is computed only over
+  scanned shipments — same "trust but verify the denominator" issue real operational data has.
+- **Label leakage guard:** `_shock_active_ground_truth` is included in the raw file for
+  analysis only and is explicitly excluded from model features — the model only ever sees the
+  imperfect `weather_risk_score`, never the ground-truth shock flag.
 
 ## 9. Deployment
 _TODO — live demo link once deployed_

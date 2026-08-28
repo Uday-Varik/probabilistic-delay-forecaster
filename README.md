@@ -73,4 +73,13 @@ GPU-heavy training steps (TFT training) run on Colab/Kaggle notebooks, not local
 
 ## Status
 
-🚧 Not started — scaffold only. Begins after `lending-compliance-rag` (Project A) is complete.
+🚧 Week 1 — synthetic shipment-delay dataset generated (10,950 lane-day rows, 10 lanes,
+2023-08-25 to 2026-08-23) and verified: overall delay rate 5.42% (target ~5-10%), peak season
+1.7x delay multiplier confirmed in the data (5.1% → 8.9%), weather shocks 3.5x (5.0% → 17.5%),
+weekend 1.27x, and the `weather_risk_score` leading indicator correctly elevated on shock days
+(0.16 → 0.71) without being a perfect predictor. Next: XGBoost/Prophet baseline.
+
+Regenerate locally with:
+```bash
+python data/scripts/generate_shipments.py
+```
