@@ -10,7 +10,6 @@ plotly
 torch
 pytorch-forecasting
 prophet
-scikit-learn
 
 pytest
 httpx
