@@ -16,10 +16,15 @@ import pandas as pd
 from src.baseline.evaluate import interval_coverage, mae, mape
 from src.baseline.features import build_features, feature_columns
 from src.baseline.prophet_model import predict_prophet, train_prophet_per_lane
-from src.baseline.xgboost_model import predict_xgboost_quantiles, train_xgboost_quantiles
+from src.baseline.xgboost_model import (
+    predict_xgboost_quantiles,
+    save_models,
+    train_xgboost_quantiles,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 DATA_PATH = ROOT / "data" / "raw" / "delay_timeseries.csv"
+MODELS_DIR = ROOT / "models"
 TEST_DAYS = 90
 
 
@@ -81,6 +86,17 @@ def main() -> None:
 
     eval_df.to_csv(ROOT / "data" / "raw" / "baseline_predictions.csv", index=False)
     print(f"\nWrote per-row predictions to data/raw/baseline_predictions.csv")
+
+    # XGBoost won on both accuracy and calibration (see case_study.md) and is
+    # simple to serve statelessly, so it's the model the API actually loads —
+    # retrained here on the FULL dataset (not the eval-only train split) since
+    # a deployed model should use all available history, not hold out 90 days
+    # for its own sake. Prophet is evaluation-only, not served live.
+    print("\nTraining production XGBoost model on full dataset for serving...")
+    full_df = build_features(pd.read_csv(DATA_PATH)).dropna(subset=feat_cols).reset_index(drop=True)
+    production_models = train_xgboost_quantiles(full_df, feat_cols)
+    save_models(production_models, MODELS_DIR)
+    print(f"Saved production models to {MODELS_DIR}")
 
 
 if __name__ == "__main__":

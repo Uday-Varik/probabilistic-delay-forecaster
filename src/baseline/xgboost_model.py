@@ -5,6 +5,8 @@ the deep-learning model's quantile outputs, not just a point estimate."""
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pandas as pd
 import xgboost as xgb
 
@@ -48,3 +50,18 @@ def predict_xgboost_quantiles(
     for q, model in models.items():
         preds[f"xgb_p{int(q * 100)}"] = model.predict(X)
     return preds
+
+
+def save_models(models: dict[float, xgb.XGBRegressor], out_dir: Path) -> None:
+    out_dir.mkdir(parents=True, exist_ok=True)
+    for q, model in models.items():
+        model.save_model(out_dir / f"xgb_p{int(q * 100)}.json")
+
+
+def load_models(in_dir: Path) -> dict[float, xgb.XGBRegressor]:
+    models: dict[float, xgb.XGBRegressor] = {}
+    for q in QUANTILES:
+        model = xgb.XGBRegressor(enable_categorical=True)
+        model.load_model(in_dir / f"xgb_p{int(q * 100)}.json")
+        models[q] = model
+    return models

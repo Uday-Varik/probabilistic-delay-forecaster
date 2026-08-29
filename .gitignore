@@ -16,3 +16,5 @@ data/processed/*
 mlruns/
 .ipynb_checkpoints/
 PRD.md
+models/
+lightning_logs/
