@@ -175,7 +175,16 @@ without materializing millions of individual rows.
   imperfect `weather_risk_score`, never the ground-truth shock flag.
 
 ## 9. Deployment
-_TODO — live demo link once deployed_
+
+Dockerized and verified — image builds clean, bakes in deterministic data generation and
+production-model training at build time (no volumes or runtime setup needed), and a real
+container run confirmed `/health`, `/lanes`, and `/forecast` all work correctly, including the
+`weather_risk_override` what-if parameter producing a large, sensible forecast shift (0.054 →
+0.194 predicted delay rate under a simulated storm warning). Only XGBoost is served live — it
+won the accuracy/calibration comparison against TFT, so the deployed image doesn't carry
+Prophet or PyTorch at all (`requirements.txt` vs. `requirements-dev.txt` split), keeping the
+container lean for a free-tier host. Live public deployment (Hugging Face Spaces vs. Render)
+and a Streamlit comparison dashboard are the remaining steps — not done yet.
 
 ## 10. Interview talking points
 
