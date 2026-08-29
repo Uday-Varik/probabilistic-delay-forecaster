@@ -1,0 +1,16 @@
+# Local development / offline training / eval only — NOT installed in the
+# deployed container (see Dockerfile, which installs requirements.txt alone).
+# The deployed API only serves the XGBoost model; training TFT/Prophet and
+# running the drift-monitor tests needs this larger set.
+-r requirements.txt
+
+streamlit
+plotly
+
+torch
+pytorch-forecasting
+prophet
+scikit-learn
+
+pytest
+httpx
