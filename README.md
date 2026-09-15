@@ -107,7 +107,10 @@ PSI-based drift monitor (`src/monitoring/drift.py`) built and tested. `/forecast
 verified end-to-end — both locally and from a real running Docker container (correct lane list,
 sensible weekday/weekend forecast shape, and a `weather_risk_override` "what-if" parameter that
 demonstrably moves the forecast: 0.054 → 0.194 predicted delay rate under a simulated storm
-warning on the same lane/day). Next: live deployment (HF Spaces/Render), Streamlit dashboard.
+warning on the same lane/day). Streamlit comparison dashboard built and verified
+(`streamlit run streamlit_app.py`) — live model-comparison table, forecast-bands-vs-actuals
+chart, and an interactive what-if forecast panel. **Only remaining step: live public deployment**
+(Hugging Face Spaces vs. Render — needs an account decision, not just code).
 
 Regenerate/retrain locally with:
 ```bash
