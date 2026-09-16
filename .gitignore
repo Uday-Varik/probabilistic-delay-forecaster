@@ -9,6 +9,13 @@ data/raw/*
 data/processed/*
 !data/raw/.gitkeep
 !data/processed/.gitkeep
+# Deployment artifacts for Streamlit Community Cloud: it only clones the repo
+# and pip-installs requirements.txt, with no build-time training step, so the
+# app needs these pre-generated (deterministic/seeded, regenerable via
+# data/scripts/generate_shipments.py + src/baseline/train.py + src/deep/train_tft.py).
+!data/raw/delay_timeseries.csv
+!data/raw/baseline_predictions.csv
+!data/raw/tft_predictions.csv
 
 *.pt
 *.pth
@@ -16,5 +23,9 @@ data/processed/*
 mlruns/
 .ipynb_checkpoints/
 PRD.md
-models/
+models/*
+!models/.gitkeep
+!models/xgb_p10.json
+!models/xgb_p50.json
+!models/xgb_p90.json
 lightning_logs/
